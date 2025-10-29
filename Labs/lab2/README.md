@@ -119,11 +119,11 @@ sonar-scanner \
   -Dsonar.login=YOUR_TOKEN_HERE
 
 pysonar \
-  --sonar-projectKey=bad-etl-pipeline \
-  --sonar-projectName="Bad ETL Pipeline" \
-  --Dsonar-sources=bad_etl_pipeline.py \
-  --Dsonar-python-version=3.9 \
-  --Dsonar-host-url=http://localhost:9000 \
+  --sonar-project-key=bad-etl-pipeline \
+  --sonar-project-name="Bad ETL Pipeline" \
+  --sonar-sources=bad_etl_pipeline.py \
+  --sonar-python-version=3.9 \
+  --sonar-host-url=http://3.250.2.41/ \
   --sonar-login=YOUR_TOKEN_HERE
 ```
 

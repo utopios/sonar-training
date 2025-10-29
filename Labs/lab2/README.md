@@ -123,8 +123,8 @@ pysonar \
   --sonar-project-name="Bad ETL Pipeline" \
   --sonar-sources=bad_etl_pipeline.py \
   --sonar-python-version=3.9 \
-  --sonar-host-url=http://3.250.2.41/ \
-  --sonar-login=YOUR_TOKEN_HERE
+  --sonar-host-url= \
+  --sonar-token=YOUR_TOKEN_HERE
 ```
 
 ### Step 3: Explore SonarQube Dashboard

@@ -1,0 +1,11 @@
+product_id,product_name,price,quantity,discount
+1,Premium Laptop,1299.99,5,0.05
+2,Wireless Mouse,29.99,150,0.10
+3,Mechanical Keyboard,89.99,75,0.15
+4,4K Monitor,449.99,30,0.08
+5,USB-C Cable,19.99,200,0.20
+6,HD Webcam,99.99,60,0.12
+7,Noise-Canceling Headphones,179.99,45,0.10
+8,Ergonomic Desk Chair,349.99,20,0.05
+9,Standing Desk,599.99,15,0.08
+10,External SSD 1TB,129.99,80,0.15

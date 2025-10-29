@@ -1,0 +1,401 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);">
+  <defs>
+    <linearGradient id="openGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="confirmedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="resolvedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="closedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#56ab2f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a8e063;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="reopenedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#eb3349;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f45c43;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="shadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-100px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(100px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      
+      @keyframes flowPath {
+        0% { stroke-dashoffset: 1000; opacity: 0; }
+        10% { opacity: 1; }
+        100% { stroke-dashoffset: 0; opacity: 1; }
+      }
+      
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+      
+      .title { animation: fadeIn 1s ease-out; }
+      
+      .status-box { animation: fadeIn 1.5s ease-out; }
+      .status-box:nth-child(1) { animation-delay: 0.3s; }
+      .status-box:nth-child(2) { animation-delay: 0.6s; }
+      .status-box:nth-child(3) { animation-delay: 0.9s; }
+      .status-box:nth-child(4) { animation-delay: 1.2s; }
+      .status-box:nth-child(5) { animation-delay: 1.5s; }
+      
+      .flow-arrow {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: flowPath 2s ease-out forwards;
+      }
+      
+      .flow-arrow:nth-child(1) { animation-delay: 0.5s; }
+      .flow-arrow:nth-child(2) { animation-delay: 1s; }
+      .flow-arrow:nth-child(3) { animation-delay: 1.5s; }
+      .flow-arrow:nth-child(4) { animation-delay: 2s; }
+      
+      .pulse-icon { animation: pulse 2s ease-in-out infinite; }
+      .blink-icon { animation: blink 2s ease-in-out infinite; }
+      
+      .action-box { animation: slideInLeft 1s ease-out; }
+      .action-box:nth-child(1) { animation-delay: 0.8s; }
+      .action-box:nth-child(2) { animation-delay: 1.2s; }
+      .action-box:nth-child(3) { animation-delay: 1.6s; }
+    </style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="700" y="50" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="white" text-anchor="middle" class="title">
+    Issue Lifecycle in SonarQube
+  </text>
+  <text x="700" y="85" font-family="Arial, sans-serif" font-size="18" fill="#e0e0e0" text-anchor="middle" class="title">
+    From Detection to Resolution
+  </text>
+  
+  <!-- Main Flow Path -->
+  
+  <!-- Detection Stage -->
+  <g class="status-box">
+    <rect x="100" y="150" width="180" height="140" rx="15" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="190" y="180" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+      🔍 Detection
+    </text>
+    <line x1="120" y1="190" x2="260" y2="190" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="190" y="215" font-family="Arial, sans-serif" font-size="12" fill="#e0e0e0" text-anchor="middle">
+      Analysis Run
+    </text>
+    <text x="190" y="235" font-family="Arial, sans-serif" font-size="12" fill="#e0e0e0" text-anchor="middle">
+      Rule Violation
+    </text>
+    <text x="190" y="255" font-family="Arial, sans-serif" font-size="12" fill="#e0e0e0" text-anchor="middle">
+      Detected
+    </text>
+    <circle cx="190" cy="270" r="8" fill="#f5576c" class="blink-icon"/>
+  </g>
+  
+  <!-- Arrow to OPEN -->
+  <path d="M 280 220 L 340 220" stroke="white" stroke-width="3" class="flow-arrow" filter="url(#glow)"/>
+  
+  <!-- OPEN Status -->
+  <g class="status-box">
+    <rect x="340" y="150" width="200" height="180" rx="15" fill="url(#openGradient)" filter="url(#shadow)"/>
+    <text x="440" y="185" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">
+      🆕 OPEN
+    </text>
+    <line x1="360" y1="195" x2="520" y2="195" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <text x="360" y="220" font-family="Arial, sans-serif" font-size="11" fill="white">
+      Status: New Issue
+    </text>
+    <text x="360" y="240" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Awaiting triage
+    </text>
+    <text x="360" y="258" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Not yet reviewed
+    </text>
+    <text x="360" y="276" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Auto-detected
+    </text>
+    <text x="440" y="305" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+      Default status
+    </text>
+  </g>
+  
+  <!-- Arrow to CONFIRMED -->
+  <path d="M 540 240 L 630 240" stroke="white" stroke-width="3" class="flow-arrow" filter="url(#glow)"/>
+  <text x="585" y="230" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">
+    Team Review
+  </text>
+  
+  <!-- CONFIRMED Status -->
+  <g class="status-box">
+    <rect x="630" y="150" width="200" height="180" rx="15" fill="url(#confirmedGradient)" filter="url(#shadow)"/>
+    <text x="730" y="185" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">
+      ✅ CONFIRMED
+    </text>
+    <line x1="650" y1="195" x2="810" y2="195" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <text x="650" y="220" font-family="Arial, sans-serif" font-size="11" fill="white">
+      Status: Real Issue
+    </text>
+    <text x="650" y="240" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Team validated
+    </text>
+    <text x="650" y="258" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Assigned to dev
+    </text>
+    <text x="650" y="276" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Needs fixing
+    </text>
+    <text x="730" y="305" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+      Action required
+    </text>
+  </g>
+  
+  <!-- Arrow to RESOLVED -->
+  <path d="M 730 330 L 730 420" stroke="white" stroke-width="3" class="flow-arrow" filter="url(#glow)"/>
+  <text x="750" y="375" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">
+    Developer
+  </text>
+  <text x="750" y="390" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">
+    Action
+  </text>
+  
+  <!-- RESOLVED Status -->
+  <g class="status-box">
+    <rect x="630" y="420" width="200" height="220" rx="15" fill="url(#resolvedGradient)" filter="url(#shadow)"/>
+    <text x="730" y="455" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">
+      🔧 RESOLVED
+    </text>
+    <line x1="650" y1="465" x2="810" y2="465" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <text x="650" y="490" font-family="Arial, sans-serif" font-size="11" fill="white">
+      Three options:
+    </text>
+    
+    <rect x="650" y="500" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)"/>
+    <text x="730" y="518" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">
+      ✓ FIXED
+    </text>
+    <text x="730" y="530" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">
+      Code corrected
+    </text>
+    
+    <rect x="650" y="545" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)"/>
+    <text x="730" y="563" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">
+      ⚠️ FALSE POSITIVE
+    </text>
+    <text x="730" y="575" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">
+      Not really a problem
+    </text>
+    
+    <rect x="650" y="590" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)"/>
+    <text x="730" y="608" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">
+      🚫 WON'T FIX
+    </text>
+    <text x="730" y="620" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">
+      Accepted tech debt
+    </text>
+  </g>
+  
+  <!-- Arrow to CLOSED -->
+  <path d="M 830 530 L 920 530" stroke="white" stroke-width="3" class="flow-arrow" filter="url(#glow)"/>
+  <text x="875" y="520" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">
+    Next Analysis
+  </text>
+  
+  <!-- CLOSED Status -->
+  <g class="status-box">
+    <rect x="920" y="460" width="200" height="140" rx="15" fill="url(#closedGradient)" filter="url(#shadow)"/>
+    <text x="1020" y="495" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle" class="pulse-icon">
+      ✔️ CLOSED
+    </text>
+    <line x1="940" y1="505" x2="1100" y2="505" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <text x="940" y="530" font-family="Arial, sans-serif" font-size="11" fill="white">
+      Status: Verified Fixed
+    </text>
+    <text x="940" y="548" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Issue gone
+    </text>
+    <text x="940" y="566" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Confirmed by scan
+    </text>
+    <text x="1020" y="590" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+      Final state
+    </text>
+  </g>
+  
+  <!-- REOPENED Status (feedback loop) -->
+  <g class="status-box">
+    <rect x="920" y="150" width="200" height="140" rx="15" fill="url(#reopenedGradient)" filter="url(#shadow)"/>
+    <text x="1020" y="185" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">
+      🔄 REOPENED
+    </text>
+    <line x1="940" y1="195" x2="1100" y2="195" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <text x="940" y="220" font-family="Arial, sans-serif" font-size="11" fill="white">
+      Status: Issue Return
+    </text>
+    <text x="940" y="238" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Still present
+    </text>
+    <text x="940" y="256" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Reappeared
+    </text>
+    <text x="1020" y="280" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+      Back to work!
+    </text>
+  </g>
+  
+  <!-- Arrow from CLOSED to REOPENED (if issue reappears) -->
+  <path d="M 1020 460 L 1020 360 Q 1020 290 1020 290" stroke="#eb3349" stroke-width="3" class="flow-arrow" stroke-dasharray="10,5" filter="url(#glow)"/>
+  <text x="1050" y="380" font-family="Arial, sans-serif" font-size="10" fill="#eb3349" font-weight="bold">
+    Issue
+  </text>
+  <text x="1050" y="395" font-family="Arial, sans-serif" font-size="10" fill="#eb3349" font-weight="bold">
+    Reappears
+  </text>
+  
+  <!-- Arrow from REOPENED back to CONFIRMED -->
+  <path d="M 920 220 L 830 220" stroke="#eb3349" stroke-width="3" class="flow-arrow" stroke-dasharray="10,5" filter="url(#glow)"/>
+  
+  <!-- Alternative Paths Section -->
+  <g transform="translate(100, 700)">
+    <rect x="0" y="0" width="480" height="150" rx="10" fill="rgba(255,255,255,0.08)" filter="url(#shadow)"/>
+    <text x="240" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+      ⚡ Quick Actions from OPEN
+    </text>
+    
+    <g class="action-box">
+      <rect x="20" y="45" width="140" height="85" rx="8" fill="rgba(0,242,254,0.2)" stroke="#00f2fe" stroke-width="2"/>
+      <text x="90" y="70" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">
+        False Positive
+      </text>
+      <text x="90" y="90" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        Mark directly
+      </text>
+      <text x="90" y="105" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        from OPEN
+      </text>
+      <text x="90" y="120" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        to RESOLVED
+      </text>
+    </g>
+    
+    <g class="action-box">
+      <rect x="170" y="45" width="140" height="85" rx="8" fill="rgba(254,225,64,0.2)" stroke="#fee140" stroke-width="2"/>
+      <text x="240" y="70" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">
+        Won't Fix
+      </text>
+      <text x="240" y="90" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        Accept as
+      </text>
+      <text x="240" y="105" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        technical debt
+      </text>
+      <text x="240" y="120" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        Add comment
+      </text>
+    </g>
+    
+    <g class="action-box">
+      <rect x="320" y="45" width="140" height="85" rx="8" fill="rgba(245,87,108,0.2)" stroke="#f5576c" stroke-width="2"/>
+      <text x="390" y="70" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">
+        Assign &amp; Tag
+      </text>
+      <text x="390" y="90" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        Assign to dev
+      </text>
+      <text x="390" y="105" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        Add tags
+      </text>
+      <text x="390" y="120" font-family="Arial, sans-serif" font-size="10" fill="#e0e0e0" text-anchor="middle">
+        Change severity
+      </text>
+    </g>
+  </g>
+  
+  <!-- Best Practices Section -->
+  <g transform="translate(650, 700)">
+    <rect x="0" y="0" width="650" height="150" rx="10" fill="rgba(255,255,255,0.08)" filter="url(#shadow)"/>
+    <text x="325" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+      💡 Best Practices for Data Engineers
+    </text>
+    
+    <text x="20" y="60" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ✓ <tspan font-weight="bold">Regular Triage:</tspan> Review new issues weekly
+    </text>
+    <text x="20" y="80" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ✓ <tspan font-weight="bold">Priority Focus:</tspan> Fix Blocker/Critical issues immediately
+    </text>
+    <text x="20" y="100" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ✓ <tspan font-weight="bold">Document Won't Fix:</tspan> Always add comment explaining why
+    </text>
+    <text x="20" y="120" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ✓ <tspan font-weight="bold">Security First:</tspan> Never mark security issues as Won't Fix
+    </text>
+    <text x="20" y="140" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ✓ <tspan font-weight="bold">Track Tech Debt:</tspan> Use tags for planned fixes
+    </text>
+    
+    <text x="350" y="60" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ⚠️ Watch for data pipeline specific issues:
+    </text>
+    <text x="370" y="80" font-family="Arial, sans-serif" font-size="11" fill="#e0e0e0">
+      • SQL injection in dynamic queries
+    </text>
+    <text x="370" y="98" font-family="Arial, sans-serif" font-size="11" fill="#e0e0e0">
+      • Hardcoded credentials in ETL scripts
+    </text>
+    <text x="370" y="116" font-family="Arial, sans-serif" font-size="11" fill="#e0e0e0">
+      • Unclosed database connections
+    </text>
+    <text x="370" y="134" font-family="Arial, sans-serif" font-size="11" fill="#e0e0e0">
+      • Missing error handling in loaders
+    </text>
+  </g>
+  
+  <!-- Timeline indicator -->
+  <line x1="190" y1="300" x2="1020" y2="300" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="5,5"/>
+  <text x="700" y="318" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-style="italic">
+    ← Timeline (minutes to days) →
+  </text>
+</svg>

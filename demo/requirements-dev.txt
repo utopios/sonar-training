@@ -1,0 +1,24 @@
+# Development Requirements
+-r requirements.txt
+
+# Code Quality Tools
+black==23.12.1          # Code formatter
+flake8==7.0.0           # Linter
+pylint==3.0.3           # Static code analyzer
+mypy==1.8.0             # Type checker
+isort==5.13.2           # Import sorter
+
+# Security
+bandit==1.7.6           # Security linter
+safety==3.0.1           # Dependency vulnerability checker
+
+# Development Tools
+ipython==8.20.0         # Enhanced Python shell
+ipdb==0.13.13           # Debugger
+
+# Type Stubs
+types-setuptools==69.0.0.0
+
+# Documentation (optional)
+# sphinx==7.2.6
+# sphinx-rtd-theme==2.0.0

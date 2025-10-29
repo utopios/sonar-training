@@ -1,0 +1,276 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <defs>
+    <!-- Gradient definitions -->
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:0.95" />
+    </linearGradient>
+    
+    <linearGradient id="iconGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="iconGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="iconGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="iconGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#30cfd0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#330867;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="iconGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a8edea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fed6e3;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="iconGradient6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff9a56;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6a88;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Filter for shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Animations -->
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes scaleIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+      }
+      
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes slideRight {
+        from { transform: translateX(-100px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes drawLine {
+        from { stroke-dashoffset: 1000; }
+        to { stroke-dashoffset: 0; }
+      }
+      
+      .title {
+        animation: fadeIn 1s ease-out;
+      }
+      
+      .subtitle {
+        animation: fadeIn 1.5s ease-out;
+      }
+      
+      .dimension-card {
+        animation: fadeIn 2s ease-out;
+        transform-origin: center;
+      }
+      
+      .dimension-card:nth-child(1) { animation-delay: 0.2s; }
+      .dimension-card:nth-child(2) { animation-delay: 0.4s; }
+      .dimension-card:nth-child(3) { animation-delay: 0.6s; }
+      .dimension-card:nth-child(4) { animation-delay: 0.8s; }
+      .dimension-card:nth-child(5) { animation-delay: 1s; }
+      .dimension-card:nth-child(6) { animation-delay: 1.2s; }
+      
+      .icon {
+        animation: scaleIn 0.5s ease-out;
+        transform-origin: center;
+      }
+      
+      .center-element {
+        animation: pulse 3s ease-in-out infinite;
+        transform-origin: center;
+      }
+      
+      .rotating {
+        animation: rotate 20s linear infinite;
+        transform-origin: center;
+      }
+      
+      .connection-line {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: drawLine 2s ease-out forwards;
+      }
+      
+      .data-flow {
+        animation: slideRight 2s ease-out;
+      }
+    </style>
+  </defs>
+  
+  <!-- Title Section -->
+  <text x="600" y="60" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="white" text-anchor="middle" class="title">
+    Introduction to Software Quality
+  </text>
+  
+  <text x="600" y="95" font-family="Arial, sans-serif" font-size="18" fill="#e0e0e0" text-anchor="middle" class="subtitle">
+    Key Dimensions for Data Engineers
+  </text>
+  
+  <!-- Central Quality Hub -->
+  <g class="center-element">
+    <circle cx="600" cy="400" r="80" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="600" y="390" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#667eea" text-anchor="middle">
+      SOFTWARE
+    </text>
+    <text x="600" y="415" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#667eea" text-anchor="middle">
+      QUALITY
+    </text>
+  </g>
+  
+  <!-- Connection Lines (drawn after delay) -->
+  <line x1="600" y1="400" x2="300" y2="220" stroke="white" stroke-width="2" opacity="0.3" class="connection-line" style="animation-delay: 1.5s"/>
+  <line x1="600" y1="400" x2="900" y2="220" stroke="white" stroke-width="2" opacity="0.3" class="connection-line" style="animation-delay: 1.5s"/>
+  <line x1="600" y1="400" x2="300" y2="580" stroke="white" stroke-width="2" opacity="0.3" class="connection-line" style="animation-delay: 1.5s"/>
+  <line x1="600" y1="400" x2="900" y2="580" stroke="white" stroke-width="2" opacity="0.3" class="connection-line" style="animation-delay: 1.5s"/>
+  <line x1="600" y1="400" x2="180" y2="400" stroke="white" stroke-width="2" opacity="0.3" class="connection-line" style="animation-delay: 1.5s"/>
+  <line x1="600" y1="400" x2="1020" y2="400" stroke="white" stroke-width="2" opacity="0.3" class="connection-line" style="animation-delay: 1.5s"/>
+  
+  <!-- Dimension Cards -->
+  
+  <!-- 1. Functionality (Top Left) -->
+  <g class="dimension-card">
+    <rect x="180" y="150" width="240" height="140" rx="10" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <circle cx="300" cy="190" r="25" fill="url(#iconGradient1)" class="icon"/>
+    <text x="300" y="198" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">⚙️</text>
+    <text x="300" y="235" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      Functionality
+    </text>
+    <text x="300" y="255" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      Does it do what
+    </text>
+    <text x="300" y="270" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      it's supposed to do?
+    </text>
+  </g>
+  
+  <!-- 2. Reliability (Top Right) -->
+  <g class="dimension-card">
+    <rect x="780" y="150" width="240" height="140" rx="10" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <circle cx="900" cy="190" r="25" fill="url(#iconGradient2)" class="icon"/>
+    <text x="900" y="198" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">✓</text>
+    <text x="900" y="235" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      Reliability
+    </text>
+    <text x="900" y="255" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      Works consistently
+    </text>
+    <text x="900" y="270" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      without failures
+    </text>
+  </g>
+  
+  <!-- 3. Security (Middle Left) -->
+  <g class="dimension-card">
+    <rect x="60" y="330" width="240" height="140" rx="10" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <circle cx="180" cy="370" r="25" fill="url(#iconGradient4)" class="icon"/>
+    <text x="180" y="378" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🔒</text>
+    <text x="180" y="415" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      Security
+    </text>
+    <text x="180" y="435" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      Protected against
+    </text>
+    <text x="180" y="450" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      vulnerabilities
+    </text>
+  </g>
+  
+  <!-- 4. Performance (Middle Right) -->
+  <g class="dimension-card">
+    <rect x="900" y="330" width="240" height="140" rx="10" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <circle cx="1020" cy="370" r="25" fill="url(#iconGradient3)" class="icon"/>
+    <text x="1020" y="378" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">⚡</text>
+    <text x="1020" y="415" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      Performance
+    </text>
+    <text x="1020" y="435" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      Executes
+    </text>
+    <text x="1020" y="450" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      efficiently
+    </text>
+  </g>
+  
+  <!-- 5. Maintainability (Bottom Left) -->
+  <g class="dimension-card">
+    <rect x="180" y="510" width="240" height="140" rx="10" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <circle cx="300" cy="550" r="25" fill="url(#iconGradient5)" class="icon"/>
+    <text x="300" y="558" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🔧</text>
+    <text x="300" y="595" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      Maintainability
+    </text>
+    <text x="300" y="615" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      Easy to modify
+    </text>
+    <text x="300" y="630" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      and improve
+    </text>
+  </g>
+  
+  <!-- 6. Portability (Bottom Right) -->
+  <g class="dimension-card">
+    <rect x="780" y="510" width="240" height="140" rx="10" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <circle cx="900" cy="550" r="25" fill="url(#iconGradient6)" class="icon"/>
+    <text x="900" y="558" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">🌐</text>
+    <text x="900" y="595" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      Portability
+    </text>
+    <text x="900" y="615" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      Runs in different
+    </text>
+    <text x="900" y="630" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">
+      environments
+    </text>
+  </g>
+  
+  <!-- Bottom Info Banner -->
+  <g class="data-flow">
+    <rect x="100" y="700" width="1000" height="70" rx="10" fill="rgba(255,255,255,0.15)" filter="url(#shadow)"/>
+    <text x="600" y="725" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+      🎯 Why Quality Matters for Data Engineers
+    </text>
+    <text x="600" y="750" font-family="Arial, sans-serif" font-size="13" fill="#e0e0e0" text-anchor="middle">
+      Data pipelines process critical business data • Bugs lead to incorrect analytics • Poor code increases technical debt
+    </text>
+  </g>
+  
+  <!-- Rotating circle decoration -->
+  <g class="rotating" opacity="0.2">
+    <circle cx="600" cy="400" r="120" fill="none" stroke="white" stroke-width="1" stroke-dasharray="5,5"/>
+    <circle cx="600" cy="280" r="8" fill="white"/>
+    <circle cx="720" cy="400" r="8" fill="white"/>
+    <circle cx="600" cy="520" r="8" fill="white"/>
+    <circle cx="480" cy="400" r="8" fill="white"/>
+  </g>
+</svg>

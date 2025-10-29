@@ -57,8 +57,8 @@ def risky_operation():
         result = 10 / 0
         file = open("nonexistent.txt")
         data = file.read()
-    except:  # Catch all - mauvaise pratique
-        pass
+    except Exception:  # Catch all - mauvaise pratique
+        raise
 
 
 

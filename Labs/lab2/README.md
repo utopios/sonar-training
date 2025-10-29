@@ -117,6 +117,14 @@ sonar-scanner \
   -Dsonar.python.version=3.9 \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.login=YOUR_TOKEN_HERE
+
+pysonar \
+  --sonar-projectKey=bad-etl-pipeline \
+  --sonar-projectName="Bad ETL Pipeline" \
+  --Dsonar-sources=bad_etl_pipeline.py \
+  --Dsonar-python-version=3.9 \
+  --Dsonar-host-url=http://localhost:9000 \
+  --sonar-login=YOUR_TOKEN_HERE
 ```
 
 ### Step 3: Explore SonarQube Dashboard

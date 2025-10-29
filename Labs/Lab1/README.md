@@ -9,6 +9,16 @@ This is a sample data pipeline project intentionally designed with various code 
 - Bugs (resource leaks, exception handling issues)
 - Low test coverage (only 2 test files covering ~15% of the code)
 
+## GET project with git from github
+
+```bash
+python3 -m venv create sonar
+source sonar/bin/activate
+pip install pysonar
+git clone https://github.com/utopios/sonar-training
+cd sonar-training/Labs/Lab1
+```
+
 ## Project Structure
 
 ```

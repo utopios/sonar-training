@@ -12,7 +12,7 @@ This is a sample data pipeline project intentionally designed with various code 
 ## GET project with git from github
 
 ```bash
-python3 -m venv create sonar
+python3 -m venv sonar
 source sonar/bin/activate
 pip install pysonar
 git clone https://github.com/utopios/sonar-training
@@ -84,6 +84,11 @@ sonar-scanner \
   -Dsonar.sources=. \
   -Dsonar.host.url=http://localhost:9000 \
   -Dsonar.login=YOUR_TOKEN_HERE
+
+pysonar \
+  --sonar-host-url=http://3.250.2.41 \
+  --sonar-token=token \
+  --sonar-project-key=project_key
 ```
 
 ## Workshop Tasks

@@ -1,0 +1,6 @@
+projectKey=ihab_lab1
+serverUrl=http://3.250.2.41
+serverVersion=25.10.0.114319
+dashboardUrl=http://3.250.2.41/dashboard?id=ihab_lab1
+ceTaskId=cfcb597a-84f9-486d-a85a-a2be8f102bcc
+ceTaskUrl=http://3.250.2.41/api/ce/task?id=cfcb597a-84f9-486d-a85a-a2be8f102bcc

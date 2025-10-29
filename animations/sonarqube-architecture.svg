@@ -1,0 +1,294 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3a6ea5 100%);">
+  <defs>
+    <linearGradient id="serverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="dbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="scannerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="elasticGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="computeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="shadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="offsetblur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+      }
+      
+      @keyframes dataFlow {
+        0% { stroke-dashoffset: 100; opacity: 0; }
+        10% { opacity: 1; }
+        100% { stroke-dashoffset: 0; opacity: 1; }
+      }
+      
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+      
+      .title { animation: fadeIn 1s ease-out; }
+      .component { animation: fadeIn 1.5s ease-out; }
+      .component:nth-child(1) { animation-delay: 0.2s; }
+      .component:nth-child(2) { animation-delay: 0.4s; }
+      .component:nth-child(3) { animation-delay: 0.6s; }
+      .component:nth-child(4) { animation-delay: 0.8s; }
+      .component:nth-child(5) { animation-delay: 1s; }
+      
+      .pulse-element { animation: pulse 3s ease-in-out infinite; }
+      
+      .data-line {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: dataFlow 3s ease-in-out infinite;
+      }
+      
+      .data-line:nth-child(1) { animation-delay: 0s; }
+      .data-line:nth-child(2) { animation-delay: 0.5s; }
+      .data-line:nth-child(3) { animation-delay: 1s; }
+      .data-line:nth-child(4) { animation-delay: 1.5s; }
+      
+      .rotating { animation: rotate 10s linear infinite; transform-origin: center; }
+      .blinking { animation: blink 2s ease-in-out infinite; }
+    </style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="700" y="50" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="white" text-anchor="middle" class="title">
+    SonarQube Architecture
+  </text>
+  <text x="700" y="85" font-family="Arial, sans-serif" font-size="18" fill="#e0e0e0" text-anchor="middle" class="title">
+    Component Interaction &amp; Data Flow
+  </text>
+  
+  <!-- Main Container -->
+  <rect x="200" y="150" width="1000" height="650" rx="20" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <text x="700" y="185" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">
+    SonarQube Platform
+  </text>
+  
+  <!-- Web Server Component -->
+  <g class="component">
+    <rect x="250" y="220" width="400" height="150" rx="15" fill="url(#serverGradient)"/>
+    <text x="450" y="255" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">
+      🌐 Web Server
+    </text>
+    <text x="450" y="280" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">
+      Port: 9000
+    </text>
+    <line x1="270" y1="290" x2="630" y2="290" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="270" y="310" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • User Interface (Dashboards)
+    </text>
+    <text x="270" y="328" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • REST API
+    </text>
+    <text x="270" y="346" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Project Management
+    </text>
+    <text x="270" y="364" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Quality Gate Configuration
+    </text>
+  </g>
+  
+  <!-- Compute Engine Component -->
+  <g class="component">
+    <rect x="750" y="220" width="400" height="150" rx="15" fill="url(#computeGradient)"/>
+    <g class="rotating">
+      <text x="950" y="260" font-family="Arial, sans-serif" font-size="22" text-anchor="middle">⚙️</text>
+    </g>
+    <text x="950" y="280" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">
+      Compute Engine
+    </text>
+    <line x1="770" y1="290" x2="1130" y2="290" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="770" y="310" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Process Analysis Reports
+    </text>
+    <text x="770" y="328" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Calculate Metrics
+    </text>
+    <text x="770" y="346" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Evaluate Quality Gates
+    </text>
+    <text x="770" y="364" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Background Task Processing
+    </text>
+  </g>
+  
+  <!-- Connection between Web Server and Compute Engine -->
+  <path d="M 650 295 L 750 295" stroke="#4facfe" stroke-width="3" class="data-line" filter="url(#glow)"/>
+  <text x="690" y="285" font-family="Arial, sans-serif" font-size="10" fill="#4facfe" text-anchor="middle">
+    Requests
+  </text>
+  
+  <!-- Database Component -->
+  <g class="component">
+    <rect x="250" y="420" width="400" height="150" rx="15" fill="url(#dbGradient)"/>
+    <text x="450" y="455" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">
+      💾 PostgreSQL Database
+    </text>
+    <line x1="270" y1="465" x2="630" y2="465" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="270" y="485" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Project Configuration
+    </text>
+    <text x="270" y="503" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Quality Profiles &amp; Gates
+    </text>
+    <text x="270" y="521" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Issues &amp; Metrics History
+    </text>
+    <text x="270" y="539" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • User Accounts &amp; Permissions
+    </text>
+    <text x="270" y="557" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Analysis Reports
+    </text>
+  </g>
+  
+  <!-- Elasticsearch Component -->
+  <g class="component">
+    <rect x="750" y="420" width="400" height="150" rx="15" fill="url(#elasticGradient)"/>
+    <text x="950" y="455" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">
+      🔍 Elasticsearch
+    </text>
+    <line x1="770" y1="465" x2="1130" y2="465" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="770" y="485" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Fast Issue Search
+    </text>
+    <text x="770" y="503" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Code Search
+    </text>
+    <text x="770" y="521" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Full-Text Indexing
+    </text>
+    <text x="770" y="539" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Real-time Search Results
+    </text>
+  </g>
+  
+  <!-- Connections to Database -->
+  <path d="M 450 370 L 450 420" stroke="#f5576c" stroke-width="3" class="data-line" filter="url(#glow)"/>
+  <path d="M 950 370 L 950 390 L 630 390 L 630 420" stroke="#fee140" stroke-width="3" class="data-line" filter="url(#glow)"/>
+  
+  <!-- Connections to Elasticsearch -->
+  <path d="M 630 295 L 700 295 L 700 495 L 750 495" stroke="#38f9d7" stroke-width="3" class="data-line" filter="url(#glow)"/>
+  
+  <!-- SonarScanner (External) -->
+  <g class="component pulse-element">
+    <rect x="250" y="640" width="400" height="130" rx="15" fill="url(#scannerGradient)"/>
+    <text x="450" y="675" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">
+      📡 SonarScanner (Client)
+    </text>
+    <line x1="270" y1="685" x2="630" y2="685" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="270" y="705" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Analyzes Source Code Locally
+    </text>
+    <text x="270" y="723" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Applies Language Analyzers
+    </text>
+    <text x="270" y="741" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Generates Analysis Report
+    </text>
+    <text x="270" y="759" font-family="Arial, sans-serif" font-size="11" fill="white">
+      • Sends to SonarQube Server
+    </text>
+  </g>
+  
+  <!-- Arrow from Scanner to Compute Engine -->
+  <path d="M 450 640 L 450 600 L 950 600 L 950 370" stroke="#00f2fe" stroke-width="4" class="data-line" stroke-dasharray="10,5" filter="url(#glow)"/>
+  <text x="700" y="595" font-family="Arial, sans-serif" font-size="12" fill="#00f2fe" font-weight="bold" text-anchor="middle">
+    Analysis Report
+  </text>
+  
+  <!-- Code Source (External) -->
+  <g class="component">
+    <rect x="750" y="640" width="400" height="130" rx="15" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+    <text x="950" y="675" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">
+      💻 Your Python Project
+    </text>
+    <line x1="770" y1="685" x2="1130" y2="685" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+    <text x="770" y="705" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📁 src/   (Source code)
+    </text>
+    <text x="770" y="723" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🧪 tests/   (Unit tests)
+    </text>
+    <text x="770" y="741" font-family="Arial, sans-serif" font-size="11" fill="white">
+      ⚙️  sonar-project.properties
+    </text>
+    <text x="770" y="759" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📊 coverage.xml
+    </text>
+  </g>
+  
+  <!-- Arrow from Code to Scanner -->
+  <path d="M 750 705 L 650 705" stroke="#4facfe" stroke-width="3" class="data-line"/>
+  <text x="700" y="695" font-family="Arial, sans-serif" font-size="10" fill="#4facfe" text-anchor="middle">
+    Source Code
+  </text>
+  
+  <!-- Analysis Flow Steps -->
+  <g transform="translate(100, 850)">
+    <rect x="0" y="0" width="1200" height="100" rx="10" fill="rgba(255,255,255,0.15)"/>
+    <text x="600" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+      🔄 Analysis Flow
+    </text>
+    <text x="600" y="55" font-family="Arial, sans-serif" font-size="12" fill="#e0e0e0" text-anchor="middle">
+      Scanner reads code → Applies rules → Generates report → Sends to server → Compute Engine processes →
+    </text>
+    <text x="600" y="75" font-family="Arial, sans-serif" font-size="12" fill="#e0e0e0" text-anchor="middle">
+      Database stores → Elasticsearch indexes → Quality Gate evaluates → Results in UI → Webhook notification
+    </text>
+  </g>
+  
+  <!-- Port indicators -->
+  <circle cx="260" cy="295" r="20" fill="rgba(255,255,255,0.2)"/>
+  <text x="260" y="301" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">
+    :9000
+  </text>
+</svg>

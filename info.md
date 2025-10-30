@@ -1,3 +1,6 @@
 ## IP Address:
-- http://3.250.2.41/
+- http://54.246.213.251:8080
 ## USER: admin
+
+
+https://www.menti.com/aljwhiazs1mo

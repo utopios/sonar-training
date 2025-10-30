@@ -1,7 +1,7 @@
 ### Steps
 
 - Create project on gitlab.
-- Get projet from gitlab with git clone http://<project_address>
+- Get projet from gitlab with git clone http://oauth2:glpat-bAMj-tBqsP-TKpDf1O1dpW86MQp1OjEH.01.0w15puzey@<project_address>
 - Add source code inside the project (From skeleton).
 - Make new commit
     ```bash

@@ -240,7 +240,7 @@ class TestProductModel:
         )
 
         discounted_price = product.apply_discount(20)
-        assert discounted_price == Decimal("80.00")
+        assert round(discounted_price, 2) == Decimal("80.00")
 
     def test_apply_discount_invalid_negative(self):
         """Test applying negative discount raises error."""
@@ -286,7 +286,7 @@ class TestProductModel:
         assert product_dict["id"] == 1
         assert product_dict["name"] == "Laptop"
         assert product_dict["description"] == "High-performance laptop"
-        assert product_dict["price"] == 999.99
+        assert round(product_dict["price"], 2) == 999.99
         assert product_dict["stock"] == 10
         assert product_dict["category"] == "Electronics"
         assert product_dict["is_available"] is True

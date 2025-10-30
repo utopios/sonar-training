@@ -105,6 +105,8 @@ class TestValidators:
         assert validate_phone_number("abc") is False
         assert validate_phone_number("") is False
         assert validate_phone_number(None) is False
+        assert validate_phone_number(123.45) is False
+        assert validate_phone_number(1234567890.5) is False
 
     def test_validate_url_valid(self):
         """Test validating valid URLs."""

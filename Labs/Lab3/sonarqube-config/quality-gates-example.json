@@ -1,0 +1,42 @@
+{
+  "name": "Lab 3 Python Quality Gate",
+  "conditions": [
+    {
+      "metric": "new_coverage",
+      "op": "LT",
+      "error": "80",
+      "description": "Coverage on New Code must be at least 80%"
+    },
+    {
+      "metric": "new_duplicated_lines_density",
+      "op": "GT",
+      "error": "3",
+      "description": "Duplicated Lines on New Code must be less than 3%"
+    },
+    {
+      "metric": "new_maintainability_rating",
+      "op": "GT",
+      "error": "1",
+      "description": "Maintainability Rating on New Code must be A"
+    },
+    {
+      "metric": "new_reliability_rating",
+      "op": "GT",
+      "error": "1",
+      "description": "Reliability Rating on New Code must be A"
+    },
+    {
+      "metric": "new_security_rating",
+      "op": "GT",
+      "error": "1",
+      "description": "Security Rating on New Code must be A"
+    },
+    {
+      "metric": "new_security_hotspots_reviewed",
+      "op": "LT",
+      "error": "100",
+      "description": "Security Hotspots Reviewed on New Code must be 100%"
+    }
+  ],
+  "description": "Custom quality gate for Lab 3 Python projects focusing on new code quality"
+}

@@ -1,0 +1,322 @@
+# GitLab CI/CD Pipeline with Docker for Python Application
+
+stages:
+  - build
+  - test
+  - analyze
+  - package
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .cache/pip
+    - .venv/
+
+# ==========================================
+# BUILD APPLICATION
+# ==========================================
+
+build-app:
+  stage: build
+  image: python:3.11-slim
+  script:
+    - echo "Building Python application..."
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install -r requirements-dev.txt
+    - pip list
+  artifacts:
+    paths:
+      - .venv/
+    expire_in: 1 hour
+  tags:
+    - docker
+
+# ==========================================
+# RUN TESTS
+# ==========================================
+
+test-app:
+  stage: test
+  image: python:3.11-slim
+  script:
+    - echo "Running tests with coverage..."
+    - source .venv/bin/activate
+
+    # Lint code
+    - flake8 src/ --max-line-length=120 --count
+
+    # Run tests with coverage
+    - pytest tests/ \
+        --verbose \
+        --cov=src \
+        --cov-report=xml:coverage.xml \
+        --cov-report=term-missing \
+        --junitxml=junit.xml
+
+    # Display coverage
+    - coverage report
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      junit: junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths:
+      - coverage.xml
+      - junit.xml
+    when: always
+  dependencies:
+    - build-app
+  tags:
+    - docker
+
+# ==========================================
+# SONARQUBE ANALYSIS
+# ==========================================
+
+sonarqube-analysis:
+  stage: analyze
+  image: sonarsource/sonar-scanner-cli:latest
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - |
+      sonar-scanner \
+        -Dsonar.projectKey=${CI_PROJECT_NAME} \
+        -Dsonar.projectName="${CI_PROJECT_NAME}" \
+        -Dsonar.sources=src \
+        -Dsonar.tests=tests \
+        -Dsonar.host.url=${SONAR_HOST_URL} \
+        -Dsonar.login=${SONAR_TOKEN} \
+        -Dsonar.python.coverage.reportPaths=coverage.xml \
+        -Dsonar.python.xunit.reportPath=junit.xml \
+        -Dsonar.qualitygate.wait=true \
+        -Dsonar.qualitygate.timeout=300
+  allow_failure: false
+  dependencies:
+    - test-app
+  only:
+    - branches
+  tags:
+    - docker
+
+# ==========================================
+# BUILD DOCKER IMAGE
+# ==========================================
+
+docker-build:
+  stage: package
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  before_script:
+    - docker info
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - echo "Building Docker image..."
+    - |
+      docker build \
+        --build-arg PYTHON_VERSION=3.11 \
+        --tag $IMAGE_TAG \
+        --tag $CI_REGISTRY_IMAGE:latest \
+        --file Dockerfile \
+        .
+
+    - echo "Pushing Docker image..."
+    - docker push $IMAGE_TAG
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+    - echo "Image size:"
+    - docker images $CI_REGISTRY_IMAGE
+  dependencies:
+    - sonarqube-analysis
+  only:
+    - main
+    - develop
+  tags:
+    - docker
+
+# ==========================================
+# SECURITY SCAN
+# ==========================================
+
+container-scanning:
+  stage: package
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  before_script:
+    - apk add --no-cache curl
+    - export TRIVY_VERSION=$(curl -s "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+    - wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+    - tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+  script:
+    - echo "Scanning Docker image for vulnerabilities..."
+    - docker pull $IMAGE_TAG
+
+    # Run Trivy scan
+    - |
+      ./trivy image \
+        --exit-code 0 \
+        --severity HIGH,CRITICAL \
+        --format json \
+        --output trivy-report.json \
+        $IMAGE_TAG
+
+    # Display summary
+    - ./trivy image --exit-code 0 --severity HIGH,CRITICAL $IMAGE_TAG
+  artifacts:
+    paths:
+      - trivy-report.json
+    when: always
+    expire_in: 1 week
+  dependencies:
+    - docker-build
+  allow_failure: true
+  only:
+    - main
+    - develop
+  tags:
+    - docker
+
+# ==========================================
+# DEPLOY TO STAGING
+# ==========================================
+
+deploy-staging:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  script:
+    - echo "Deploying to staging environment..."
+
+    # Setup GCP authentication
+    - echo ${GCP_SERVICE_KEY} | base64 -d > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project ${GCP_PROJECT_ID}
+
+    # Pull image from GitLab registry and push to GCR
+    - docker pull $IMAGE_TAG
+    - docker tag $IMAGE_TAG gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
+    - gcloud auth configure-docker
+    - docker push gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
+
+    # Deploy to Cloud Run
+    - |
+      gcloud run deploy ${CI_PROJECT_NAME}-staging \
+        --image gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA} \
+        --platform managed \
+        --region europe-west1 \
+        --allow-unauthenticated \
+        --memory 512Mi \
+        --set-env-vars "ENVIRONMENT=staging,VERSION=${CI_COMMIT_SHORT_SHA}"
+
+    # Test deployment
+    - |
+      SERVICE_URL=$(gcloud run services describe ${CI_PROJECT_NAME}-staging \
+        --region europe-west1 \
+        --format 'value(status.url)')
+      echo "Deployed to: ${SERVICE_URL}"
+      curl -f ${SERVICE_URL}/health || echo "Health check endpoint not available"
+  environment:
+    name: staging
+    url: https://${CI_PROJECT_NAME}-staging-xxxxx.run.app
+  dependencies:
+    - docker-build
+  only:
+    - develop
+  tags:
+    - docker
+
+# ==========================================
+# DEPLOY TO PRODUCTION
+# ==========================================
+
+deploy-production:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  script:
+    - echo "Deploying to production environment..."
+
+    # Setup GCP authentication
+    - echo ${GCP_SERVICE_KEY} | base64 -d > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project ${GCP_PROJECT_ID}
+
+    # Tag and push production image
+    - docker pull $IMAGE_TAG
+    - docker tag $IMAGE_TAG gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:production
+    - docker tag $IMAGE_TAG gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
+    - gcloud auth configure-docker
+    - docker push gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:production
+    - docker push gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
+
+    # Deploy to Cloud Run
+    - |
+      gcloud run deploy ${CI_PROJECT_NAME} \
+        --image gcr.io/${GCP_PROJECT_ID}/${CI_PROJECT_NAME}:production \
+        --platform managed \
+        --region europe-west1 \
+        --allow-unauthenticated \
+        --memory 1Gi \
+        --min-instances 1 \
+        --max-instances 10 \
+        --set-env-vars "ENVIRONMENT=production,VERSION=${CI_COMMIT_SHORT_SHA}"
+
+    # Test deployment
+    - |
+      SERVICE_URL=$(gcloud run services describe ${CI_PROJECT_NAME} \
+        --region europe-west1 \
+        --format 'value(status.url)')
+      echo "Deployed to: ${SERVICE_URL}"
+      curl -f ${SERVICE_URL}/health || echo "Health check endpoint not available"
+  environment:
+    name: production
+    url: https://${CI_PROJECT_NAME}-xxxxx.run.app
+    on_stop: stop-production
+  dependencies:
+    - docker-build
+  when: manual
+  only:
+    - main
+    - master
+  tags:
+    - docker
+
+# ==========================================
+# STOP PRODUCTION (Optional)
+# ==========================================
+
+stop-production:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  script:
+    - echo "Stopping production deployment..."
+    - echo ${GCP_SERVICE_KEY} | base64 -d > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project ${GCP_PROJECT_ID}
+    - gcloud run services delete ${CI_PROJECT_NAME} --region europe-west1 --quiet
+  environment:
+    name: production
+    action: stop
+  when: manual
+  only:
+    - main
+    - master
+  tags:
+    - docker

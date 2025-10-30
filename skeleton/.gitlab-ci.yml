@@ -29,6 +29,6 @@ sonar:
   image: python:${PYTHON_VERSION}
   script:
     - pip install pysonar
-    - pysonar --sonar-host-url=http://54.246.213.251:8080 --sonar-token=sqp_ab8d3f048f2e9da29be31789637f0eef0a6f9614  --sonar-project-key=demo-cicd-ihab --sonar-qualitygate-wait
+    - pysonar --sonar-host-url=$SONAR_HOST --sonar-token=$SONAR_PASSWORD  --sonar-project-key=demo-cicd-ihab --sonar-qualitygate-wait
   only:
     - main

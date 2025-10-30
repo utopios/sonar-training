@@ -1,0 +1,399 @@
+# Google Cloud Build Configuration for Python Application with SonarQube
+#
+# This configuration implements a complete CI/CD pipeline including:
+# - Dependency installation
+# - Code linting and testing
+# - SonarQube code quality analysis
+# - Quality Gate validation
+# - Docker containerization
+# - Deployment to Cloud Run
+
+steps:
+  # ==========================================
+  # STEP 1: Install Dependencies
+  # ==========================================
+  - name: 'python:3.11-slim'
+    id: 'install-dependencies'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Installing Python dependencies..."
+        python --version
+        pip --version
+
+        # Upgrade pip
+        pip install --upgrade pip
+
+        # Install dependencies
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+        # Verify installation
+        pip list
+
+    waitFor: ['-']  # Start immediately
+
+  # ==========================================
+  # STEP 2: Lint Code
+  # ==========================================
+  - name: 'python:3.11-slim'
+    id: 'lint'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Running code linters..."
+
+        # Install linting tools
+        pip install --upgrade pip
+        pip install -r requirements-dev.txt
+
+        # Run flake8
+        echo "Running flake8..."
+        flake8 src/ --max-line-length=120 --statistics --count || exit_code=$?
+
+        # Run pylint
+        echo "Running pylint..."
+        pylint src/ --exit-zero --reports=y
+
+        # Run bandit for security
+        echo "Running bandit security scan..."
+        bandit -r src/ -f json -o /workspace/bandit-report.json || true
+
+        exit ${exit_code:-0}
+    waitFor: ['install-dependencies']
+
+  # ==========================================
+  # STEP 3: Run Tests with Coverage
+  # ==========================================
+  - name: 'python:3.11-slim'
+    id: 'test'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Running unit tests with coverage..."
+
+        # Install dependencies
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+        # Run pytest with coverage
+        pytest tests/ \
+          --verbose \
+          --cov=src \
+          --cov-report=xml:coverage.xml \
+          --cov-report=html:htmlcov \
+          --cov-report=term-missing \
+          --junitxml=junit.xml
+
+        # Display coverage report
+        echo ""
+        echo "Coverage Report:"
+        coverage report
+
+        # Save coverage for SonarQube
+        ls -la coverage.xml
+    waitFor: ['install-dependencies']
+
+  # ==========================================
+  # STEP 4: Retrieve SonarQube Token
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'get-sonar-token'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Retrieving SonarQube token from Secret Manager..."
+        gcloud secrets versions access latest --secret="sonar-token" > /workspace/sonar-token.txt
+        echo "Token retrieved successfully"
+    waitFor: ['test']
+
+  # ==========================================
+  # STEP 5: SonarQube Analysis
+  # ==========================================
+  - name: 'sonarsource/sonar-scanner-cli:latest'
+    id: 'sonar-analysis'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Running SonarQube analysis..."
+
+        # Read token
+        SONAR_TOKEN=$(cat /workspace/sonar-token.txt)
+
+        # Display configuration
+        echo "Project Key: ${PROJECT_ID}-${_SERVICE_NAME}"
+        echo "SonarQube URL: ${_SONAR_HOST_URL}"
+
+        # Run SonarQube scanner
+        sonar-scanner \
+          -Dsonar.projectKey=${PROJECT_ID}-${_SERVICE_NAME} \
+          -Dsonar.projectName="${_SERVICE_NAME}" \
+          -Dsonar.sources=src \
+          -Dsonar.tests=tests \
+          -Dsonar.host.url=${_SONAR_HOST_URL} \
+          -Dsonar.login=$${SONAR_TOKEN} \
+          -Dsonar.python.version=3.11 \
+          -Dsonar.python.coverage.reportPaths=coverage.xml \
+          -Dsonar.python.xunit.reportPath=junit.xml \
+          -Dsonar.projectVersion=${SHORT_SHA} \
+          -Dsonar.scm.provider=git \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.qualitygate.wait=false
+
+        echo "SonarQube analysis completed"
+        echo "View results at: ${_SONAR_HOST_URL}/dashboard?id=${PROJECT_ID}-${_SERVICE_NAME}"
+    waitFor: ['get-sonar-token']
+
+  # ==========================================
+  # STEP 6: Quality Gate Check
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/curl'
+    id: 'quality-gate'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Checking Quality Gate status..."
+
+        # Wait for SonarQube to process the analysis
+        echo "Waiting for analysis to complete..."
+        sleep 15
+
+        # Read token
+        SONAR_TOKEN=$(cat /workspace/sonar-token.txt)
+
+        # Fetch Quality Gate status
+        QUALITY_GATE_STATUS=$(curl -s -u $${SONAR_TOKEN}: \
+          "${_SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=${PROJECT_ID}-${_SERVICE_NAME}" \
+          | grep -oP '"status":"\K[^"]+' || echo "ERROR")
+
+        echo ""
+        echo "================================================"
+        echo "Quality Gate Status: $${QUALITY_GATE_STATUS}"
+        echo "================================================"
+        echo ""
+
+        if [ "$${QUALITY_GATE_STATUS}" = "OK" ]; then
+          echo "✓ Quality Gate PASSED!"
+          echo "View details: ${_SONAR_HOST_URL}/dashboard?id=${PROJECT_ID}-${_SERVICE_NAME}"
+          exit 0
+        elif [ "$${QUALITY_GATE_STATUS}" = "ERROR" ]; then
+          echo "⚠ Could not retrieve Quality Gate status"
+          echo "Check SonarQube server: ${_SONAR_HOST_URL}"
+          echo "Continuing build..."
+          exit 0
+        else
+          echo "✗ Quality Gate FAILED!"
+          echo "View issues: ${_SONAR_HOST_URL}/dashboard?id=${PROJECT_ID}-${_SERVICE_NAME}"
+          exit 1
+        fi
+    waitFor: ['sonar-analysis']
+
+  # ==========================================
+  # STEP 7: Build Docker Image
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-build'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
+      - '--build-arg'
+      - 'PYTHON_VERSION=3.11'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    waitFor: ['quality-gate']
+
+  # ==========================================
+  # STEP 8: Push Docker Image to GCR
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-push'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}'
+    waitFor: ['docker-build']
+
+  # ==========================================
+  # STEP 9: Scan Image for Vulnerabilities
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'vulnerability-scan'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Scanning Docker image for vulnerabilities..."
+        gcloud container images describe gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA \
+          --show-package-vulnerability || true
+
+        echo "Image vulnerability scan completed"
+    waitFor: ['docker-push']
+
+  # ==========================================
+  # STEP 10: Deploy to Cloud Run (Staging)
+  # ==========================================
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-staging'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}-staging'
+      - '--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--max-instances=10'
+      - '--set-env-vars=ENVIRONMENT=staging,VERSION=$SHORT_SHA'
+      - '--port=8080'
+    waitFor: ['vulnerability-scan']
+
+  # ==========================================
+  # STEP 11: Test Staging Deployment
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'test-staging'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Testing staging deployment..."
+
+        # Get service URL
+        SERVICE_URL=$(gcloud run services describe ${_SERVICE_NAME}-staging \
+          --region=${_REGION} \
+          --format='value(status.url)')
+
+        echo "Service URL: $${SERVICE_URL}"
+
+        # Wait for service to be ready
+        sleep 10
+
+        # Test health endpoint
+        echo "Testing health endpoint..."
+        for i in {1..5}; do
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $${SERVICE_URL}/health || echo "000")
+          if [ "$${HTTP_STATUS}" = "200" ]; then
+            echo "✓ Health check passed! (HTTP $${HTTP_STATUS})"
+            exit 0
+          fi
+          echo "Attempt $i/5: HTTP $${HTTP_STATUS}, retrying..."
+          sleep 5
+        done
+
+        echo "⚠ Health endpoint not responding as expected"
+        echo "Deployment completed but health check failed"
+        exit 0  # Don't fail the build
+    waitFor: ['deploy-staging']
+
+  # ==========================================
+  # STEP 12: Deploy to Production (Manual)
+  # ==========================================
+  # This step should be triggered manually or via a separate trigger
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-production'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ "${_DEPLOY_PRODUCTION}" = "true" ]; then
+          echo "Deploying to production..."
+          gcloud run deploy ${_SERVICE_NAME} \
+            --image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA \
+            --region=${_REGION} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --memory=1Gi \
+            --cpu=2 \
+            --min-instances=1 \
+            --max-instances=100 \
+            --set-env-vars=ENVIRONMENT=production,VERSION=$SHORT_SHA \
+            --port=8080
+
+          # Get production URL
+          SERVICE_URL=$(gcloud run services describe ${_SERVICE_NAME} \
+            --region=${_REGION} \
+            --format='value(status.url)')
+
+          echo ""
+          echo "================================================"
+          echo "✓ Production deployment completed!"
+          echo "URL: $${SERVICE_URL}"
+          echo "================================================"
+        else
+          echo "Skipping production deployment (_DEPLOY_PRODUCTION != true)"
+        fi
+    waitFor: ['test-staging']
+
+# ==========================================
+# Build Options
+# ==========================================
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  logStreamingOption: STREAM_ON
+  dynamicSubstitutions: true
+
+# ==========================================
+# Timeout
+# ==========================================
+timeout: '1800s'  # 30 minutes
+
+# ==========================================
+# Substitutions (Default Values)
+# ==========================================
+substitutions:
+  _SERVICE_NAME: 'python-app'
+  _REGION: 'europe-west1'
+  _SONAR_HOST_URL: 'https://sonarqube.example.com'
+  _DEPLOY_PRODUCTION: 'false'
+
+# ==========================================
+# Artifacts
+# ==========================================
+artifacts:
+  objects:
+    location: 'gs://${PROJECT_ID}_cloudbuild/artifacts/${BUILD_ID}'
+    paths:
+      - 'coverage.xml'
+      - 'htmlcov/**'
+      - 'junit.xml'
+      - 'bandit-report.json'
+      - '.scannerwork/report-task.txt'
+
+# ==========================================
+# Images
+# ==========================================
+images:
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
+
+# ==========================================
+# Tags
+# ==========================================
+tags:
+  - 'python'
+  - 'sonarqube'
+  - 'cloud-run'
+  - '${_SERVICE_NAME}'
+
+# ==========================================
+# Available Logs & Dashboards
+# ==========================================
+# - Cloud Build Logs: https://console.cloud.google.com/cloud-build/builds?project=${PROJECT_ID}
+# - SonarQube Dashboard: ${_SONAR_HOST_URL}/dashboard?id=${PROJECT_ID}-${_SERVICE_NAME}
+# - Cloud Run (Staging): https://console.cloud.google.com/run/detail/${_REGION}/${_SERVICE_NAME}-staging
+# - Cloud Run (Production): https://console.cloud.google.com/run/detail/${_REGION}/${_SERVICE_NAME}

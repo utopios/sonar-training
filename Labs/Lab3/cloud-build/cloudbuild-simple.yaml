@@ -1,0 +1,73 @@
+# Simplified Google Cloud Build Configuration for Python with SonarQube
+
+steps:
+  # Install dependencies
+  - name: 'python:3.11'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+  # Run tests with coverage
+  - name: 'python:3.11'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pytest --cov=src --cov-report=xml --cov-report=term
+
+  # Get SonarQube token
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'gcloud secrets versions access latest --secret="sonar-token" > /workspace/sonar-token.txt'
+
+  # SonarQube analysis
+  - name: 'sonarsource/sonar-scanner-cli:latest'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        SONAR_TOKEN=$(cat /workspace/sonar-token.txt)
+        sonar-scanner \
+          -Dsonar.projectKey=${PROJECT_ID}-${_SERVICE_NAME} \
+          -Dsonar.sources=src \
+          -Dsonar.tests=tests \
+          -Dsonar.host.url=${_SONAR_HOST_URL} \
+          -Dsonar.login=$${SONAR_TOKEN} \
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+
+  # Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA', '.']
+
+  # Push Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA']
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+
+timeout: '1200s'
+
+substitutions:
+  _SERVICE_NAME: 'python-app'
+  _REGION: 'europe-west1'
+  _SONAR_HOST_URL: 'https://sonarqube.example.com'
+
+images:
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA'
